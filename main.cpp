@@ -6,45 +6,45 @@
 
 const int INF = std::numeric_limits<int>::max();
 
-struct Nodo {
+struct Nodo { //definir estructura Nodo para usarla en priority queue
     int distancia, nodo;
-    bool operator>(const Nodo &otro) const {
+    bool operator>(const Nodo &otro) const { //overflow para poder comparar en el while
         return distancia > otro.distancia;
     }
 };
 
 std::pair<int, std::vector<int>> dijkstra(int n, int origen, int destino, const std::vector<std::vector<std::pair<int, int>>> &grafo) {
-    std::vector<int> distancias(n, INF);
-    std::vector<int> predecesor(n, -1);
+    std::vector<int> distancias(n, INF); //vector distancias inicializado en INF
+    std::vector<int> predecesor(n, -1); //predecesor inicializado en -1
     distancias[origen] = 0;
 
-    std::priority_queue<Nodo, std::vector<Nodo>, std::greater<Nodo>> pq;
+    std::priority_queue<Nodo, std::vector<Nodo>, std::greater<Nodo>> pq; //priority queue de Nodos, Nodos con menor distancia tienen mayor prioridad
     pq.push({0, origen});
 
     while (!pq.empty()) {
-        int distancia_actual = pq.top().distancia;
-        int nodo_actual = pq.top().nodo;
-        pq.pop();
+        int distancia_actual = pq.top().distancia; //tomar la menor distancia
+        int nodo_actual = pq.top().nodo; //tomar el nodo con menor distancia
+        pq.pop(); //eliminarlo de la queue
 
-        if (nodo_actual == destino) break;
+        if (nodo_actual == destino) break; //ya llegamos al destino
 
-        if (distancia_actual > distancias[nodo_actual]) continue;
+        if (distancia_actual > distancias[nodo_actual]) continue; //el nodo ya fue evaluado
 
         for (const auto &vecino : grafo[nodo_actual]) {
             int nodo_vecino = vecino.first;
             int peso_arista = vecino.second;
 
             if (distancias[nodo_actual] + peso_arista < distancias[nodo_vecino]) {
-                distancias[nodo_vecino] = distancias[nodo_actual] + peso_arista;
-                predecesor[nodo_vecino] = nodo_actual;
-                pq.push({distancias[nodo_vecino], nodo_vecino});
+                distancias[nodo_vecino] = distancias[nodo_actual] + peso_arista; //actualizar las distancias de los nodos
+                predecesor[nodo_vecino] = nodo_actual; //actualizar el predecesor del nodo
+                pq.push({distancias[nodo_vecino], nodo_vecino}); //agregarlo a la priority queue
             }
         }
     }
 
     std::vector<int> camino;
     for (int v = destino; v != -1; v = predecesor[v]) {
-        camino.push_back(v);
+        camino.push_back(v); //hacer un nuevo arreglo para eliminar los valores que no necesitamos
     }
     std::reverse(camino.begin(), camino.end());
 
